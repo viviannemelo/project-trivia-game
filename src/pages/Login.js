@@ -11,6 +11,14 @@ class Login extends Component {
     this.setState({ [name]: value });
   };
 
+  validateButon = () => {
+    const { email, name } = this.state;
+    const minCharactersPassWord = 1;
+    const verifyEmail = /^\w+([.-]?\w+)@\w+([.-]?\w+)(\.\w{2,3})+$/.test(email);
+    const verifyName = name.length >= minCharactersPassWord;
+    return verifyEmail && verifyName;
+  };
+
   render() {
     const { name, email } = this.state;
 
@@ -35,7 +43,7 @@ class Login extends Component {
         <button
           type="button"
           data-testid="btn-play"
-          disabled={ !email.match(/^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gm) }
+          disabled={ !this.validateButon() }
         >
           Play
         </button>
