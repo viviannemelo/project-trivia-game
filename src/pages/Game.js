@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../service/triviaServices';
 
@@ -23,6 +24,7 @@ class Game extends Component {
     turn: 0,
     score: 0,
     reveal: false,
+    token: '',
   };
 
   async componentDidMount() {
@@ -41,6 +43,7 @@ class Game extends Component {
     this.setState({
       questions: results,
       randomAnswers: this.randomize(correct, incorrect),
+      token,
     });
 
     this.callTimer();
@@ -91,6 +94,32 @@ class Game extends Component {
     return '';
   };
 
+  saveRanking = () => {
+    const { score, token } = this.state;
+    const { name, gravatarImage, gravatarEmail } = this.props;
+    const listGravatar = JSON.parse(localStorage.getItem('listGravatar'));
+    if (listGravatar) {
+      const obj = {
+        name,
+        score,
+        gravatarImage,
+        gravatarEmail,
+        token,
+      };
+      listGravatar.push(obj);
+      localStorage.setItem('listGravatar', JSON.stringify(listGravatar));
+    } else {
+      const gravatar = {
+        name,
+        score,
+        gravatarImage,
+        gravatarEmail,
+        token,
+      };
+      localStorage.setItem('listGravatar', JSON.stringify([gravatar]));
+    }
+  };
+
   handleClick = () => {
     const { turn, score } = this.state;
     const { history } = this.props;
@@ -98,6 +127,7 @@ class Game extends Component {
     const point = 10;
 
     if (turn === MAXTURN) {
+      this.saveRanking();
       history.push('/feedback');
     } else {
       this.setState({
@@ -165,9 +195,18 @@ Game.defaultProps = {
 };
 
 Game.propTypes = {
+  name: PropTypes.string.isRequired,
+  gravatarImage: PropTypes.string.isRequired,
+  gravatarEmail: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
 };
+const mapStateToProps = (state) => ({
+  name: state.player.name,
+  score: state.player.score,
+  gravatarImage: state.player.gravatarImage,
+  gravatarEmail: state.player.gravatarEmail,
+});
 
-export default Game;
+export default connect(mapStateToProps)(Game);
