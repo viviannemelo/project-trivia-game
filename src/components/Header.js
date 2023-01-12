@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../trivia.png';
+import logo from '../images/trivia.png';
 
 class Header extends Component {
   render() {
