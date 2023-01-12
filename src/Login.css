@@ -1,0 +1,105 @@
+.login-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-login-container {
+  align-items: center;
+  background-color: white;
+  border: black solid 5px;
+  border-radius: 3px;
+  display: flex;
+  min-height: 300px;
+  width: 30%;
+}
+
+.form-login {
+  align-items: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto , sans-serif;
+  justify-content: space-evenly;
+  min-height: 250px;
+  width: 100%;
+}
+
+.input-name {
+  background-color: rgb(101, 108, 122);
+  border: black 5px solid;
+  border-radius: 3px;
+  color: white;
+  font-family: Roboto , sans-serif;
+  font-size: 25px;
+  font-weight: 900;
+  padding: 10px;
+  text-align: center;
+  width: 55%;
+}
+
+.input-email {
+  background-color: rgb(101, 108, 122);
+  border: black 5px solid;
+  border-radius: 3px;
+  color: white;
+  font-size: 25px;
+  font-weight: 900;
+  margin: 10px 0;
+  padding: 10px;
+  text-align: center;
+  width: 55%;
+}
+
+.input-email:hover {
+  width: 75%;
+}
+
+.input-name:hover {
+  width: 75%;
+}
+
+.btn-play {
+  background-color: black;
+  border: black 5px solid;
+  border-radius: 3px;
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  padding: 5px;
+  width: 35%;
+}
+
+.btn-play:hover {
+  background-color: red;
+  border: 5px solid red;
+  border-radius: 10px;
+  color: white;
+  width: 45%;
+}
+
+.btn-settings {
+  background-color: black;
+  border: black 5px solid;
+  border-radius: 3px;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 10px;
+  padding: 10px;
+  width: 35%;
+}
+
+.btn-settings:hover {
+  width: 45%;
+}
+
+::placeholder {
+  color: white;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+body {
+  background-color: rgb(40, 44, 52);
+}
