@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import fetchToken from '../service/triviaServices';
+import '../Login.css';
 
 class Login extends Component {
   state = {
@@ -39,10 +40,10 @@ class Login extends Component {
     const { name, email } = this.state;
 
     return (
-      <section>
+      <section className="login-container">
         <Header />
-        <div>
-          <form onSubmit={ this.handleSubmit }>
+        <div className="form-login-container">
+          <form onSubmit={ this.handleSubmit } className="form-login">
             <input
               type="text"
               placeholder="Username"
@@ -50,6 +51,7 @@ class Login extends Component {
               name="name"
               value={ name }
               onChange={ this.handleChange }
+              className="input-name"
             />
             <input
               type="text"
@@ -58,11 +60,13 @@ class Login extends Component {
               value={ email }
               data-testid="input-gravatar-email"
               onChange={ this.handleChange }
+              className="input-email"
             />
             <button
               type="submit"
               data-testid="btn-play"
               disabled={ !this.validateButon() }
+              className="btn-play"
             >
               Play
             </button>
@@ -70,6 +74,8 @@ class Login extends Component {
               type="button"
               data-testid="btn-settings"
               onClick={ this.handleSettingsButton }
+              className="btn-settings"
+
             >
               Configurações
             </button>
