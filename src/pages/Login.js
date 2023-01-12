@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
-import fetchToken from '../service/triviaServices';
 import { login } from '../redux/actions';
+import { fetchToken } from '../service/triviaServices';
+import '../Login.css';
 
 class Login extends Component {
   state = {
@@ -16,7 +17,7 @@ class Login extends Component {
     this.setState({ [name]: value });
   };
 
-  validateButon = () => {
+  validateButton = () => {
     const { email, name } = this.state;
     const minCharactersPassWord = 1;
     const verifyEmail = /^\w+([.-]?\w+)@\w+([.-]?\w+)(\.\w{2,3})+$/.test(email);
@@ -34,14 +35,19 @@ class Login extends Component {
     history.push('/game');
   };
 
+  handleSettingsButton = () => {
+    const { history } = this.props;
+    history.push('/settings');
+  };
+
   render() {
     const { name, email } = this.state;
 
     return (
-      <section>
+      <section className="login-container">
         <Header />
-        <div>
-          <form onSubmit={ this.handleSubmit }>
+        <div className="form-login-container">
+          <form onSubmit={ this.handleSubmit } className="form-login">
             <input
               type="text"
               placeholder="Username"
@@ -49,6 +55,7 @@ class Login extends Component {
               name="name"
               value={ name }
               onChange={ this.handleChange }
+              className="input-name"
             />
             <input
               type="text"
@@ -57,13 +64,24 @@ class Login extends Component {
               value={ email }
               data-testid="input-gravatar-email"
               onChange={ this.handleChange }
+              className="input-email"
             />
             <button
               type="submit"
               data-testid="btn-play"
-              disabled={ !this.validateButon() }
+              disabled={ !this.validateButton() }
+              className="btn-play"
             >
               Play
+            </button>
+            <button
+              type="button"
+              data-testid="btn-settings"
+              onClick={ this.handleSettingsButton }
+              className="btn-settings"
+
+            >
+              Configurações
             </button>
           </form>
         </div>
