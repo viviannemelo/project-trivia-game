@@ -10,6 +10,7 @@ class Feedback extends Component {
 
   render() {
     // const { name, score, gravatarImage } = this.props;
+
     return (
       <section className="App-section">
         <h2>Feedback</h2>
@@ -26,6 +27,15 @@ class Feedback extends Component {
     );
   }
 }
+Feedback.defaultProps = {
+  history: {},
+};
+
+Feedback.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }),
+};
 
 Feedback.defaultProps = {
   history: {},
