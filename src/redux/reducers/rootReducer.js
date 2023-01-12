@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { LOGIN } from '../actions';
+import { LOGIN, SAVE_GRAVATAR } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -15,6 +15,11 @@ const player = (state = INITIAL_STATE, action) => {
       ...state,
       name: action.name,
       gravatarEmail: action.gravatarEmail,
+    };
+  case SAVE_GRAVATAR:
+    return {
+      ...state,
+      gravatarImage: action.payload,
     };
   default:
     return state;

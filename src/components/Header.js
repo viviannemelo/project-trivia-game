@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import md5 from 'crypto-js/md5';
 import logo from '../images/trivia.png';
+import { saveGravatar } from '../redux/actions';
 
 class Header extends Component {
 /*  A imagem do perfil vinda do Gravatar em um elemento que deve possuir o atributo data-testid com o valor header-profile-picture
@@ -13,8 +14,9 @@ O placar zerado em um elemento que deve possuir o atributo data-testid com o val
   };
 
   componentDidMount() {
-    const { gravatarEmail } = this.props;
+    const { gravatarEmail, dispatch } = this.props;
     const hash = md5(gravatarEmail).toString();
+    dispatch(saveGravatar(`https://www.gravatar.com/avatar/${hash}`));
     this.setState({ gravatar: hash });
   }
 
