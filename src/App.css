@@ -1,7 +1,17 @@
 body {
+  background-color: #282c34;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+#root {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  width: 100vw;
 }
 
 .App {
@@ -36,7 +46,16 @@ body {
   flex-direction: column;
   font-size: calc(10px + 2vmin);
   justify-content: center;
-  min-height: 100vh;
+}
+
+.App-section {
+  align-items: center;
+  background-color: #282c34;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  font-size: calc(10px + 2vmin);
+  justify-content: center;
 }
 
 .App-link {
