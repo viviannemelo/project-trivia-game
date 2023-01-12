@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
+import { login } from '../redux/actions';
 import { fetchToken } from '../service/triviaServices';
 import '../Login.css';
 
@@ -25,8 +27,10 @@ class Login extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, dispatch } = this.props;
+    const { name, email } = this.state;
     const { token } = await fetchToken();
+    dispatch(login(name, email));
     localStorage.setItem('token', token);
     history.push('/game');
   };
@@ -91,9 +95,10 @@ Login.defaultProps = {
 };
 
 Login.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
 };
 
-export default Login;
+export default connect()(Login);
