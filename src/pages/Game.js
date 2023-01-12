@@ -17,6 +17,8 @@ class Game extends Component {
       incorrect_answers: [],
     }],
     randomAnswers: [],
+    turn: 0,
+    reveal: false,
   };
 
   async componentDidMount() {
@@ -36,6 +38,16 @@ class Game extends Component {
     });
   }
 
+  componentDidUpdate(_, prevState) {
+    const { questions, turn } = this.state;
+    const { correct_answer: correct, incorrect_answers: incorrect } = questions[turn];
+    if (prevState.turn !== turn) {
+      this.setState({
+        randomAnswers: this.randomize(correct, incorrect),
+      });
+    }
+  }
+
   randomize = (correct, incorrect) => {
     const answers = [correct, ...incorrect];
     const randomAnswers = answers.sort(() => Math.random() - RANDOM);
@@ -47,13 +59,25 @@ class Game extends Component {
     return INDEX.count;
   };
 
+  handleReveal = (answer) => {
+    const { reveal, turn, questions } = this.state;
+    const { correct_answer: correct } = questions[turn];
+    console.log(correct);
+    if (reveal && answer === correct) {
+      return 'green';
+    } if (reveal) {
+      return 'red';
+    }
+    return '';
+  };
+
   render() {
-    const { questions, randomAnswers } = this.state;
+    const { questions, randomAnswers, turn } = this.state;
     const {
       question,
       category,
       correct_answer: correct,
-    } = questions[0];
+    } = questions[turn];
 
     return (
       <section className="App-section">
@@ -72,6 +96,8 @@ class Game extends Component {
                   ? 'correct-answer'
                   : `wrong-answer-${this.handleIndex()}`
               }
+              className={ this.handleReveal(answer) }
+              onClick={ () => this.setState({ reveal: true }) }
             >
               {answer}
             </button>
