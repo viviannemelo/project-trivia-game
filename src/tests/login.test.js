@@ -1,48 +1,83 @@
-import React from 'react';
-import { screen } from '@testing-library/react';
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { renderWithRouterAndRedux } from './helpers/renderWithRouterAndRedux';
 import App from '../App';
-import Login from '../pages/Login';
+
 
 describe('Testes da tela de Login', () => {
     test('Testa se a tela de login possui inputs para nome e email do usuário:', () => {
-        const { history } = renderWithRouterAndRedux(<App />);
-        const name = screen.getByRole('textbox', {
-            name: /name:/i
-          });
-        const email = screen.getByRole('textbox', {
-            name: /email:/i
-          });
+        renderWithRouterAndRedux(<App />);
+        const name = screen.getByTestId('input-player-name');
+        const email = screen.getByTestId('input-gravatar-email');
         
-        expect(history.location.pathname).toBe('/');
         expect(name).toBeInTheDocument();
         expect(email).toBeInTheDocument();
     });
     
-    test('Testa se a tela de login possui botão "play" e se ele fica dasabilitado se os campos não forem preenchidos:', () => {
-        renderWithRouterAndRedux(<Login />);
+    test('Testa se a tela de login possui os botões play e configurações:', () => {
+        renderWithRouterAndRedux(<App />);
         const playBtn = screen.getByRole('button', {
             name: /play/i
           });
-        const name = screen.getByRole('textbox', {
-            name: /name:/i
-          });
-        const email = screen.getByRole('textbox', {
-            name: /email:/i
+        const settingsBtn = screen.getByRole('button', {
+            name: /configurações/i
           });  
 
-        expect(name.value).toBe('');
-        expect(name.id).toBe('name');
-        expect(email.value).toBe('');
-        expect(playBtn.disabled).toBe(true);
-
-        userEvent.type(name, 'Test');
-        expect(name.value).toBe('Test');
-        expect(playBtn.disabled).toBe(true);
-
-        userEvent.type(email, 'test@test.com');
-        expect(email.value).toBe('test@test.com');
-        expect(playBtn.disabled).toBe(false);
+        expect(playBtn).toBeInTheDocument();
+        expect(settingsBtn).toBeInTheDocument();
     });
+
+    test('Testa se o botão play esta desativado quando os inputs de nome e email estiveram vazios:', () => {
+      renderWithRouterAndRedux(<App />);
+      const playBtn = screen.getByRole('button', {
+          name: /play/i
+        });
+
+      expect(playBtn).toBeDisabled();
+    });
+
+    test('Testa se o botão play é ativado ao preencher os inputs', () => {
+      renderWithRouterAndRedux(<App />);
+      const name = screen.getByTestId('input-player-name');
+      const email = screen.getByTestId('input-gravatar-email'); 
+      const playBtn = screen.getByRole('button', {
+        name: /play/i
+      });
+
+      userEvent.type(email, 'test@test.com');
+      expect(playBtn).toBeDisabled();
+
+      userEvent.type(name, 'Test');
+      userEvent.clear(email);
+      expect(playBtn).toBeDisabled();
+
+      userEvent.type(email, 'test@test.com')
+      expect(playBtn).toBeEnabled();
+    })
+
+    test('Testa se o botão play redireciona para a página "/game" e chama a função fetch', () => {
+      const { history } = renderWithRouterAndRedux(<App />);
+      const name = screen.getByTestId('input-player-name');
+      const email = screen.getByTestId('input-gravatar-email'); 
+      const playBtn = screen.getByRole('button', {
+        name: /play/i
+      });
+
+      userEvent.type(name, 'Test');
+      userEvent.type(email, 'test@test.com');
+      userEvent.click(playBtn);
+      waitFor(() => {
+        expect(history.location.pathname).toBe('/game');
+      });
+    })
+    
+    test('Testa se o botão de configurações para a página "/settings"', () => {
+      const { history } = renderWithRouterAndRedux(<App />);
+      const settingsBtn = screen.getByRole('button', {
+        name: /configurações/i
+      }); 
+
+      userEvent.click(settingsBtn);
+      expect(history.location.pathname).toBe('/settings');
+    })
 });
