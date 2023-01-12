@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
-import fetchToken from '../service/triviaServices';
+import { fetchToken } from '../service/triviaServices';
 
 class Login extends Component {
   state = {
@@ -14,7 +14,7 @@ class Login extends Component {
     this.setState({ [name]: value });
   };
 
-  validateButon = () => {
+  validateButton = () => {
     const { email, name } = this.state;
     const minCharactersPassWord = 1;
     const verifyEmail = /^\w+([.-]?\w+)@\w+([.-]?\w+)(\.\w{2,3})+$/.test(email);
@@ -62,7 +62,7 @@ class Login extends Component {
             <button
               type="submit"
               data-testid="btn-play"
-              disabled={ !this.validateButon() }
+              disabled={ !this.validateButton() }
             >
               Play
             </button>
