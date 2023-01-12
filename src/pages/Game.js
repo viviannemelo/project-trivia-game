@@ -26,7 +26,7 @@ class Game extends Component {
     const token = localStorage.getItem('token');
     const { results, response_code: responseCode } = await fetchQuestions(token);
     if (responseCode === ERROR) {
-      localStorage.clear();
+      localStorage.removeItem('token');
       history.push('/');
       return;
     }
