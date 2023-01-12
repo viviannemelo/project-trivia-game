@@ -9,7 +9,8 @@ class Feedback extends Component {
   };
 
   render() {
-    // console.log(this.props.score);
+    // const { name, score, gravatarImage } = this.props;
+
     return (
       <section className="App-section">
         <h2>Feedback</h2>
@@ -31,6 +32,19 @@ Feedback.defaultProps = {
 };
 
 Feedback.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }),
+};
+
+Feedback.defaultProps = {
+  history: {},
+};
+
+Feedback.propTypes = {
+  // name: PropTypes.string.isRequired,
+  // score: PropTypes.number.isRequired,
+  // gravatarImage: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
