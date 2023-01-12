@@ -25,11 +25,13 @@ class Game extends Component {
     const { history } = this.props;
     const token = localStorage.getItem('token');
     const { results, response_code: responseCode } = await fetchQuestions(token);
+
     if (responseCode === ERROR) {
       localStorage.removeItem('token');
       history.push('/');
       return;
     }
+
     const { correct_answer: correct, incorrect_answers: incorrect } = results[0];
 
     this.setState({
