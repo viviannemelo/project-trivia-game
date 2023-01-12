@@ -6,6 +6,8 @@ import { fetchQuestions } from '../service/triviaServices';
 const RANDOM = 0.5;
 const ERROR = 3;
 const INDEX = { count: -1 };
+const SECOND = 1000;
+const MAXTURN = 4;
 
 class Game extends Component {
   state = {
@@ -17,7 +19,9 @@ class Game extends Component {
       incorrect_answers: [],
     }],
     randomAnswers: [],
+    timer: 10,
     turn: 0,
+    score: 0,
     reveal: false,
   };
 
@@ -38,11 +42,14 @@ class Game extends Component {
       questions: results,
       randomAnswers: this.randomize(correct, incorrect),
     });
+
+    this.callTimer();
   }
 
   componentDidUpdate(_, prevState) {
-    const { questions, turn } = this.state;
+    const { questions, turn, timer } = this.state;
     const { correct_answer: correct, incorrect_answers: incorrect } = questions[turn];
+    console.log(timer);
     if (prevState.turn !== turn) {
       this.setState({
         randomAnswers: this.randomize(correct, incorrect),
@@ -61,9 +68,21 @@ class Game extends Component {
     return INDEX.count;
   };
 
+  callTimer = () => {
+    this.intervalId = setInterval(() => {
+      this.setState((prevState) => ({
+        ...prevState,
+        timer: prevState.timer - 1,
+      }));
+    }, SECOND);
+  };
+
   handleReveal = (answer) => {
     const { reveal, turn, questions } = this.state;
     const { correct_answer: correct } = questions[turn];
+
+    if (reveal) clearInterval(this.intervalId);
+
     if (reveal && answer === correct) {
       return 'green';
     } if (reveal) {
@@ -73,8 +92,21 @@ class Game extends Component {
   };
 
   handleClick = () => {
-    const { turn } = this.state;
-    this.setState({ turn: turn + 1, reveal: false });
+    const { turn, score } = this.state;
+    const { history } = this.props;
+
+    const point = 10;
+
+    if (turn === MAXTURN) {
+      history.push('/feedback');
+    } else {
+      this.setState({
+        turn: turn + 1,
+        reveal: false,
+        timer: 10,
+        score: score + point,
+      }, this.callTimer);
+    }
   };
 
   render() {
