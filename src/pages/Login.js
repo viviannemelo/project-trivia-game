@@ -4,7 +4,6 @@ import Header from '../components/Header';
 import { fetchToken } from '../service/triviaServices';
 import '../Login.css';
 
-
 class Login extends Component {
   state = {
     name: '',
