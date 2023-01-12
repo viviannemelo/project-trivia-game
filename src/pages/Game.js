@@ -83,16 +83,6 @@ class Game extends Component {
       correct_answer: correct,
     } = questions[turn];
 
-    const nextBtn = (
-      <button
-        type="button"
-        data-testid="btn-next"
-        onClick={ this.handleClick }
-      >
-        Próxima
-      </button>
-    );
-
     return (
       <section className="App-section">
         <Header />
@@ -118,7 +108,18 @@ class Game extends Component {
           ))}
         </section>
         <section>
-          { reveal && nextBtn }
+          {
+            reveal
+              && (
+                <button
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.handleClick }
+                >
+                  Próxima
+                </button>
+              )
+          }
         </section>
       </section>
     );
