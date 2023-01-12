@@ -62,7 +62,6 @@ class Game extends Component {
   handleReveal = (answer) => {
     const { reveal, turn, questions } = this.state;
     const { correct_answer: correct } = questions[turn];
-    console.log(correct);
     if (reveal && answer === correct) {
       return 'green';
     } if (reveal) {
@@ -71,13 +70,28 @@ class Game extends Component {
     return '';
   };
 
+  handleClick = () => {
+    const { turn } = this.state;
+    this.setState({ turn: turn + 1, reveal: false });
+  };
+
   render() {
-    const { questions, randomAnswers, turn } = this.state;
+    const { questions, randomAnswers, turn, reveal } = this.state;
     const {
       question,
       category,
       correct_answer: correct,
     } = questions[turn];
+
+    const nextBtn = (
+      <button
+        type="button"
+        data-testid="btn-next"
+        onClick={ this.handleClick }
+      >
+        Próxima
+      </button>
+    );
 
     return (
       <section className="App-section">
@@ -102,6 +116,9 @@ class Game extends Component {
               {answer}
             </button>
           ))}
+        </section>
+        <section>
+          { reveal && nextBtn }
         </section>
       </section>
     );
