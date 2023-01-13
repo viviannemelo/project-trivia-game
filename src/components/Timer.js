@@ -15,15 +15,13 @@ export class Timer extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { onTimeOut, isNextQuestion, notNextAnymore } = this.props;
+    const { onTimeOut, isCountingDown } = this.props;
     const { counter } = this.state;
-    if (counter !== prevState.counter && counter === 0) {
-      clearInterval(this.interval);
-      onTimeOut();
-    }
-    if (isNextQuestion !== prevProps.isNextQuestion && isNextQuestion) {
-      this.setCounter();
-      notNextAnymore();
+    if (counter !== prevState.counter && counter === 0) onTimeOut();
+
+    if (prevProps.isCountingDown !== isCountingDown) {
+      if (isCountingDown) this.setCounter();
+      else clearInterval(this.interval);
     }
   }
 
@@ -49,8 +47,7 @@ export class Timer extends Component {
 Timer.propTypes = {
   getTimer: PropTypes.func.isRequired,
   onTimeOut: PropTypes.func.isRequired,
-  isNextQuestion: PropTypes.bool.isRequired,
-  notNextAnymore: PropTypes.func.isRequired,
+  isCountingDown: PropTypes.bool.isRequired,
 };
 
 export default Timer;
