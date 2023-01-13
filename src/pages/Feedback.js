@@ -58,15 +58,6 @@ class Feedback extends Component {
     );
   }
 }
-Feedback.defaultProps = {
-  history: {},
-};
-
-Feedback.propTypes = {
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired,
-  }),
-};
 
 Feedback.defaultProps = {
   history: {},
