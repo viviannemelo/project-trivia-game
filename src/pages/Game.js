@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../service/triviaServices';
 import Counter from '../components/Timer';
+import { saveScore } from '../redux/actions';
 
 const RANDOM = 0.5;
 const ERROR = 3;
 const INDEX = { count: -1 };
+const MAXTURN = 4;
+const POINTS = 10;
+const DIFFICULTY = {
+  hard: 3,
+  medium: 2,
+  easy: 1,
+};
 
 class Game extends Component {
   state = {
@@ -21,6 +30,7 @@ class Game extends Component {
     ],
     randomAnswers: [],
     turn: 0,
+    timer: 0,
     reveal: false,
     isTimeOut: false,
     isNextQuestion: false,
@@ -86,6 +96,13 @@ class Game extends Component {
 
   handleClick = () => {
     const { turn } = this.state;
+
+    if (turn === MAXTURN) {
+      const { history } = this.props;
+      history.push('/feedback');
+      return;
+    }
+
     this.setState({
       turn: turn + 1,
       reveal: false,
@@ -102,6 +119,22 @@ class Game extends Component {
     const txt = document.createElement('textarea');
     txt.innerHTML = html;
     return txt.value;
+  };
+
+  getTimer = (str) => {
+    this.setState({ timer: str - 1 });
+  };
+
+  handleClickReveal = (_, answer) => {
+    const { dispatch } = this.props;
+    const { questions, turn, timer } = this.state;
+    this.setState({ reveal: true }, () => {
+      const { correct_answer: correct } = questions[turn];
+      if (answer === correct) {
+        const scorePoints = POINTS + (timer * DIFFICULTY[questions[turn].difficulty]);
+        dispatch(saveScore(scorePoints));
+      }
+    });
   };
 
   render() {
@@ -133,7 +166,7 @@ class Game extends Component {
                   : `wrong-answer-${this.handleIndex()}`
               }
               className={ this.handleReveal(answer) }
-              onClick={ () => this.setState({ reveal: true }) }
+              onClick={ (event) => this.handleClickReveal(event, answer) }
               disabled={ isTimeOut }
             >
               {this.decodeHtml(answer)}
@@ -144,6 +177,7 @@ class Game extends Component {
           onTimeOut={ this.onTimeOut }
           isNextQuestion={ isNextQuestion }
           notNextAnymore={ this.notNextAnymore }
+          getTimer={ this.getTimer }
         />
         <section>
           {(reveal || isTimeOut) && (
@@ -166,9 +200,10 @@ Game.defaultProps = {
 };
 
 Game.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
 };
 
-export default Game;
+export default connect()(Game);
