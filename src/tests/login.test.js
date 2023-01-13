@@ -3,8 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { renderWithRouterAndRedux } from './helpers/renderWithRouterAndRedux';
 import App from '../App';
 
+const mockToken = {
+    token: 'ab98a9va8e9a8f9ae'
+}
 
 describe('Testes da tela de Login', () => {
+
     test('Testa se a tela de login possui inputs para nome e email do usuário:', () => {
         renderWithRouterAndRedux(<App />);
         const name = screen.getByTestId('input-player-name');
@@ -56,6 +60,10 @@ describe('Testes da tela de Login', () => {
     })
 
     test('Testa se o botão play redireciona para a página "/game" e chama a função fetch', () => {
+      jest.spyOn(global, 'fetch')
+      global.fetch.mockResolvedValue({
+            json: jest.fn().mockResolvedValue(mockToken)
+      })
       const { history } = renderWithRouterAndRedux(<App />);
       const name = screen.getByTestId('input-player-name');
       const email = screen.getByTestId('input-gravatar-email'); 
@@ -66,6 +74,7 @@ describe('Testes da tela de Login', () => {
       userEvent.type(name, 'Test');
       userEvent.type(email, 'test@test.com');
       userEvent.click(playBtn);
+      expect(global.fetch).toHaveBeenCalled();
       waitFor(() => {
         expect(history.location.pathname).toBe('/game');
       });
