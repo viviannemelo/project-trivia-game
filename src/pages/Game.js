@@ -9,6 +9,7 @@ import { saveScore } from '../redux/actions';
 const RANDOM = 0.5;
 const ERROR = 3;
 const INDEX = { count: -1 };
+const SECOND = 1000;
 const MAXTURN = 4;
 const POINTS = 10;
 const DIFFICULTY = {
@@ -29,10 +30,13 @@ class Game extends Component {
       },
     ],
     randomAnswers: [],
+    timer: 10,
     turn: 0,
-    timer: 0,
+    score: 0,
     reveal: false,
+    token: '',
     isTimeOut: false,
+
   };
 
   async componentDidMount() {
@@ -53,12 +57,16 @@ class Game extends Component {
     this.setState({
       questions: results,
       randomAnswers: this.randomize(correct, incorrect),
+      token,
     });
+
+    this.callTimer();
   }
 
   componentDidUpdate(_, prevState) {
-    const { questions, turn } = this.state;
+    const { questions, turn, timer } = this.state;
     const { correct_answer: correct, incorrect_answers: incorrect } = questions[turn];
+    console.log(timer);
     if (prevState.turn !== turn) {
       this.setState({
         randomAnswers: this.randomize(correct, incorrect),
@@ -81,9 +89,19 @@ class Game extends Component {
     return INDEX.count;
   };
 
+  callTimer = () => {
+    this.intervalId = setInterval(() => {
+      this.setState((prevState) => ({
+        ...prevState,
+        timer: prevState.timer - 1,
+      }));
+    }, SECOND);
+  };
+
   handleReveal = (answer) => {
     const { reveal, turn, questions, isTimeOut } = this.state;
     const { correct_answer: correct } = questions[turn];
+    if (reveal) clearInterval(this.intervalId);
     if (reveal && answer === correct) {
       return 'green';
     }
@@ -93,15 +111,33 @@ class Game extends Component {
     return '';
   };
 
+  saveRanking = () => {
+    const { token } = this.state;
+    const { name, gravatarImage, gravatarEmail, score } = this.props;
+    const listGravatar = JSON.parse(localStorage.getItem('listGravatar'));
+    const gravatar = {
+      name,
+      score,
+      gravatarImage,
+      gravatarEmail,
+      token,
+    };
+    if (listGravatar) {
+      listGravatar.push(gravatar);
+      localStorage.setItem('listGravatar', JSON.stringify(listGravatar));
+    } else {
+      localStorage.setItem('listGravatar', JSON.stringify([gravatar]));
+    }
+  };
+
   handleClick = () => {
     const { turn } = this.state;
-
     if (turn === MAXTURN) {
       const { history } = this.props;
+      this.saveRanking();
       history.push('/feedback');
       return;
     }
-
     this.setState({
       turn: turn + 1,
       reveal: false,
@@ -141,7 +177,6 @@ class Game extends Component {
       isTimeOut,
     } = this.state;
     const { question, category, correct_answer: correct } = questions[turn];
-
     return (
       <section className="App-section">
         <Header />
@@ -188,16 +223,23 @@ class Game extends Component {
     );
   }
 }
-
 Game.defaultProps = {
   history: {},
 };
-
 Game.propTypes = {
+  name: PropTypes.string.isRequired,
+  score: PropTypes.number.isRequired,
+  gravatarImage: PropTypes.string.isRequired,
+  gravatarEmail: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
 };
-
-export default connect()(Game);
+const mapStateToProps = (state) => ({
+  name: state.player.name,
+  score: state.player.score,
+  gravatarImage: state.player.gravatarImage,
+  gravatarEmail: state.player.gravatarEmail,
+});
+export default connect(mapStateToProps)(Game);

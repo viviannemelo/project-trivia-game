@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { resetState } from '../redux/actions';
 
 const HITSBREAKPOINT = 3;
 
@@ -11,7 +12,8 @@ class Feedback extends Component {
   };
 
   restartGame = () => {
-    const { history } = this.props;
+    const { history, dispatch } = this.props;
+    dispatch(resetState());
     history.push('/');
   };
 
@@ -68,6 +70,7 @@ Feedback.propTypes = {
   score: PropTypes.number.isRequired,
   assertions: PropTypes.number.isRequired,
   gravatarImage: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
