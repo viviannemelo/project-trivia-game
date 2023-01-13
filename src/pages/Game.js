@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { fetchQuestions } from '../service/triviaServices';
+import Counter from '../components/Timer';
 
 const RANDOM = 0.5;
 const ERROR = 3;
@@ -9,22 +10,28 @@ const INDEX = { count: -1 };
 
 class Game extends Component {
   state = {
-    questions: [{
-      category: '',
-      difficulty: '',
-      question: '',
-      correct_answer: '',
-      incorrect_answers: [],
-    }],
+    questions: [
+      {
+        category: '',
+        difficulty: '',
+        question: '',
+        correct_answer: '',
+        incorrect_answers: [],
+      },
+    ],
     randomAnswers: [],
     turn: 0,
     reveal: false,
+    isTimeOut: false,
+    isNextQuestion: false,
   };
 
   async componentDidMount() {
     const { history } = this.props;
     const token = localStorage.getItem('token');
-    const { results, response_code: responseCode } = await fetchQuestions(token);
+    const { results, response_code: responseCode } = await fetchQuestions(
+      token,
+    );
 
     if (responseCode === ERROR) {
       localStorage.removeItem('token');
@@ -50,6 +57,10 @@ class Game extends Component {
     }
   }
 
+  onTimeOut = () => {
+    this.setState({ isTimeOut: true });
+  };
+
   randomize = (correct, incorrect) => {
     const answers = [correct, ...incorrect];
     const randomAnswers = answers.sort(() => Math.random() - RANDOM);
@@ -62,11 +73,12 @@ class Game extends Component {
   };
 
   handleReveal = (answer) => {
-    const { reveal, turn, questions } = this.state;
+    const { reveal, turn, questions, isTimeOut } = this.state;
     const { correct_answer: correct } = questions[turn];
     if (reveal && answer === correct) {
       return 'green';
-    } if (reveal) {
+    }
+    if (reveal || isTimeOut) {
       return 'red';
     }
     return '';
@@ -74,23 +86,41 @@ class Game extends Component {
 
   handleClick = () => {
     const { turn } = this.state;
-    this.setState({ turn: turn + 1, reveal: false });
+    this.setState({
+      turn: turn + 1,
+      reveal: false,
+      isNextQuestion: true,
+      isTimeOut: false,
+    });
+  };
+
+  notNextAnymore = () => {
+    this.setState({ isNextQuestion: false });
+  };
+
+  decodeHtml = (html) => { // to remove the HTML entities like &lt &quot...
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
   };
 
   render() {
-    const { questions, randomAnswers, turn, reveal } = this.state;
     const {
-      question,
-      category,
-      correct_answer: correct,
-    } = questions[turn];
+      questions,
+      randomAnswers,
+      turn,
+      reveal,
+      isTimeOut,
+      isNextQuestion,
+    } = this.state;
+    const { question, category, correct_answer: correct } = questions[turn];
 
     return (
       <section className="App-section">
         <Header />
         <section>
           <h2 data-testid="question-category">{category}</h2>
-          <h2 data-testid="question-text">{question}</h2>
+          <h2 data-testid="question-text">{this.decodeHtml(question)}</h2>
         </section>
         <section data-testid="answer-options">
           {randomAnswers.map((answer, index) => (
@@ -104,24 +134,27 @@ class Game extends Component {
               }
               className={ this.handleReveal(answer) }
               onClick={ () => this.setState({ reveal: true }) }
+              disabled={ isTimeOut }
             >
-              {answer}
+              {this.decodeHtml(answer)}
             </button>
           ))}
         </section>
+        <Counter
+          onTimeOut={ this.onTimeOut }
+          isNextQuestion={ isNextQuestion }
+          notNextAnymore={ this.notNextAnymore }
+        />
         <section>
-          {
-            reveal
-              && (
-                <button
-                  type="button"
-                  data-testid="btn-next"
-                  onClick={ this.handleClick }
-                >
-                  Próxima
-                </button>
-              )
-          }
+          {(reveal || isTimeOut) && (
+            <button
+              type="button"
+              data-testid="btn-next"
+              onClick={ this.handleClick }
+            >
+              Próxima
+            </button>
+          )}
         </section>
       </section>
     );
