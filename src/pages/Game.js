@@ -169,7 +169,6 @@ class Game extends Component {
         <Counter
           isCountingDown={ !isTimeOut && !reveal }
           onTimeOut={ this.onTimeOut }
-          isNextQuestion={ isNextQuestion }
           notNextAnymore={ this.notNextAnymore }
           getTimer={ this.getTimer }
         />
