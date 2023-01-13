@@ -32,7 +32,10 @@ export class Timer extends Component {
   }
 
   countDown = () => {
-    this.setState((state) => ({ counter: state.counter - 1 }));
+    const { getTimer } = this.props;
+    const { counter } = this.state;
+
+    this.setState((state) => ({ counter: state.counter - 1 }), () => getTimer(counter));
   };
 
   render() {
@@ -42,6 +45,7 @@ export class Timer extends Component {
 }
 
 Timer.propTypes = {
+  getTimer: PropTypes.func.isRequired,
   onTimeOut: PropTypes.func.isRequired,
   isCountingDown: PropTypes.bool.isRequired,
 };
