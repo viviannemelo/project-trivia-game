@@ -119,7 +119,8 @@ class Game extends Component {
     this.setState({ timer: str - 1 });
   };
 
-  handleClickReveal = (_, answer) => {
+  handleClickReveal = (answer) => {
+    console.log(answer);
     const { dispatch } = this.props;
     const { questions, turn, timer } = this.state;
     this.setState({ reveal: true }, () => {
@@ -159,7 +160,7 @@ class Game extends Component {
                   : `wrong-answer-${this.handleIndex()}`
               }
               className={ this.handleReveal(answer) }
-              onClick={ (event) => this.handleClickReveal(event, answer) }
+              onClick={ () => this.handleClickReveal(answer) }
               disabled={ isTimeOut }
             >
               {this.decodeHtml(answer)}
