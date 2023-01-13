@@ -31,6 +31,7 @@ class Ranking extends Component {
     return (
       <main>
         <section>
+          <h1 data-testid="ranking-title">Ranking</h1>
           <ol>
             {listGravatar.map((gravatar, index) => (
               <li
