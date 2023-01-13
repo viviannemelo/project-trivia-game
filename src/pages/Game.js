@@ -134,7 +134,7 @@ class Game extends Component {
           ))}
         </section>
         <Counter
-          shouldPlay={ !isTimeOut && !reveal }
+          isCountingDown={ !isTimeOut && !reveal }
           onTimeOut={ this.onTimeOut }
         />
         <section>

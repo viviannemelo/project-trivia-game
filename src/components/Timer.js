@@ -15,12 +15,12 @@ export class Timer extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { onTimeOut, shouldPlay } = this.props;
+    const { onTimeOut, isCountingDown } = this.props;
     const { counter } = this.state;
     if (counter !== prevState.counter && counter === 0) onTimeOut();
 
-    if (prevProps.shouldPlay !== shouldPlay) {
-      if (shouldPlay) this.setCounter();
+    if (prevProps.isCountingDown !== isCountingDown) {
+      if (isCountingDown) this.setCounter();
       else clearInterval(this.interval);
     }
   }
@@ -43,7 +43,7 @@ export class Timer extends Component {
 
 Timer.propTypes = {
   onTimeOut: PropTypes.func.isRequired,
-  shouldPlay: PropTypes.bool.isRequired,
+  isCountingDown: PropTypes.bool.isRequired,
 };
 
 export default Timer;
