@@ -35,8 +35,6 @@ class Game extends Component {
     score: 0,
     reveal: false,
     token: '',
-    timer: 0,
-    reveal: false,
     isTimeOut: false,
 
   };
@@ -114,8 +112,8 @@ class Game extends Component {
   };
 
   saveRanking = () => {
-    const { score, token } = this.state;
-    const { name, gravatarImage, gravatarEmail } = this.props;
+    const { token } = this.state;
+    const { name, gravatarImage, gravatarEmail, score } = this.props;
     const listGravatar = JSON.parse(localStorage.getItem('listGravatar'));
     const gravatar = {
       name,
@@ -134,14 +132,12 @@ class Game extends Component {
 
   handleClick = () => {
     const { turn } = this.state;
-
     if (turn === MAXTURN) {
       const { history } = this.props;
       this.saveRanking();
       history.push('/feedback');
       return;
     }
-
     this.setState({
       turn: turn + 1,
       reveal: false,
@@ -232,6 +228,7 @@ Game.defaultProps = {
 };
 Game.propTypes = {
   name: PropTypes.string.isRequired,
+  score: PropTypes.number.isRequired,
   gravatarImage: PropTypes.string.isRequired,
   gravatarEmail: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,

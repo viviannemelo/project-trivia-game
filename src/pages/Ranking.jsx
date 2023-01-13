@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { resetState } from '../redux/actions';
 
 class Ranking extends Component {
   state = {
@@ -11,17 +12,18 @@ class Ranking extends Component {
     const negative = -1;
     const listGravatar = JSON.parse(localStorage.getItem('listGravatar'));
     listGravatar.sort((a, b) => {
-      if (a.score > b.score) return 1;
-      if (a.score < b.score) return negative;
+      if (a.score < b.score) return 1;
+      if (a.score > b.score) return negative;
       return 0;
     });
     this.setState({ listGravatar });
   }
 
   goHome = () => {
-    const { history } = this.props;
+    const { history, dispatch } = this.props;
     localStorage.removeItem('token');
     history.push('/');
+    dispatch(resetState());
   };
 
   render() {
@@ -56,9 +58,7 @@ Ranking.defaultProps = {
 };
 
 Ranking.propTypes = {
-  /* name: PropTypes.string.isRequired,
-  gravatarImage: PropTypes.string.isRequired,
-  score: PropTypes.string.isRequired, */
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
