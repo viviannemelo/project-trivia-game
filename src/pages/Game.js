@@ -3,34 +3,50 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../service/triviaServices';
+import Counter from '../components/Timer';
+import { saveScore } from '../redux/actions';
 
 const RANDOM = 0.5;
 const ERROR = 3;
 const INDEX = { count: -1 };
 const SECOND = 1000;
 const MAXTURN = 4;
+const POINTS = 10;
+const DIFFICULTY = {
+  hard: 3,
+  medium: 2,
+  easy: 1,
+};
 
 class Game extends Component {
   state = {
-    questions: [{
-      category: '',
-      difficulty: '',
-      question: '',
-      correct_answer: '',
-      incorrect_answers: [],
-    }],
+    questions: [
+      {
+        category: '',
+        difficulty: '',
+        question: '',
+        correct_answer: '',
+        incorrect_answers: [],
+      },
+    ],
     randomAnswers: [],
     timer: 10,
     turn: 0,
     score: 0,
     reveal: false,
     token: '',
+    timer: 0,
+    reveal: false,
+    isTimeOut: false,
+
   };
 
   async componentDidMount() {
     const { history } = this.props;
     const token = localStorage.getItem('token');
-    const { results, response_code: responseCode } = await fetchQuestions(token);
+    const { results, response_code: responseCode } = await fetchQuestions(
+      token,
+    );
 
     if (responseCode === ERROR) {
       localStorage.removeItem('token');
@@ -60,6 +76,10 @@ class Game extends Component {
     }
   }
 
+  onTimeOut = () => {
+    this.setState({ isTimeOut: true });
+  };
+
   randomize = (correct, incorrect) => {
     const answers = [correct, ...incorrect];
     const randomAnswers = answers.sort(() => Math.random() - RANDOM);
@@ -81,14 +101,13 @@ class Game extends Component {
   };
 
   handleReveal = (answer) => {
-    const { reveal, turn, questions } = this.state;
+    const { reveal, turn, questions, isTimeOut } = this.state;
     const { correct_answer: correct } = questions[turn];
-
     if (reveal) clearInterval(this.intervalId);
-
     if (reveal && answer === correct) {
       return 'green';
-    } if (reveal) {
+    }
+    if (reveal || isTimeOut) {
       return 'red';
     }
     return '';
@@ -98,61 +117,76 @@ class Game extends Component {
     const { score, token } = this.state;
     const { name, gravatarImage, gravatarEmail } = this.props;
     const listGravatar = JSON.parse(localStorage.getItem('listGravatar'));
+    const gravatar = {
+      name,
+      score,
+      gravatarImage,
+      gravatarEmail,
+      token,
+    };
     if (listGravatar) {
-      const obj = {
-        name,
-        score,
-        gravatarImage,
-        gravatarEmail,
-        token,
-      };
-      listGravatar.push(obj);
+      listGravatar.push(gravatar);
       localStorage.setItem('listGravatar', JSON.stringify(listGravatar));
     } else {
-      const gravatar = {
-        name,
-        score,
-        gravatarImage,
-        gravatarEmail,
-        token,
-      };
       localStorage.setItem('listGravatar', JSON.stringify([gravatar]));
     }
   };
 
   handleClick = () => {
-    const { turn, score } = this.state;
-    const { history } = this.props;
-
-    const point = 10;
+    const { turn } = this.state;
 
     if (turn === MAXTURN) {
+      const { history } = this.props;
       this.saveRanking();
       history.push('/feedback');
-    } else {
-      this.setState({
-        turn: turn + 1,
-        reveal: false,
-        timer: 10,
-        score: score + point,
-      }, this.callTimer);
+      return;
     }
+
+    this.setState({
+      turn: turn + 1,
+      reveal: false,
+      isTimeOut: false,
+    });
+  };
+
+  decodeHtml = (html) => { // to remove the HTML entities like &lt &quot...
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+  };
+
+  getTimer = (str) => {
+    this.setState({ timer: str - 1 });
+  };
+
+  handleClickReveal = (answer) => {
+    console.log(answer);
+    const { dispatch } = this.props;
+    const { questions, turn, timer } = this.state;
+    this.setState({ reveal: true }, () => {
+      const { correct_answer: correct } = questions[turn];
+      if (answer === correct) {
+        const scorePoints = POINTS + (timer * DIFFICULTY[questions[turn].difficulty]);
+        dispatch(saveScore(scorePoints));
+      }
+    });
   };
 
   render() {
-    const { questions, randomAnswers, turn, reveal } = this.state;
     const {
-      question,
-      category,
-      correct_answer: correct,
-    } = questions[turn];
-
+      questions,
+      randomAnswers,
+      turn,
+      reveal,
+      isTimeOut,
+    } = this.state;
+    const { question, category, correct_answer: correct } = questions[turn];
     return (
       <section className="App-section">
         <Header />
         <section>
           <h2 data-testid="question-category">{category}</h2>
-          <h2 data-testid="question-text">{question}</h2>
+          <h2 data-testid="question-text">{this.decodeHtml(question)}</h2>
         </section>
         <section data-testid="answer-options">
           {randomAnswers.map((answer, index) => (
@@ -165,39 +199,42 @@ class Game extends Component {
                   : `wrong-answer-${this.handleIndex()}`
               }
               className={ this.handleReveal(answer) }
-              onClick={ () => this.setState({ reveal: true }) }
+              onClick={ () => this.handleClickReveal(answer) }
+              disabled={ isTimeOut }
             >
-              {answer}
+              {this.decodeHtml(answer)}
             </button>
           ))}
         </section>
+        <Counter
+          isCountingDown={ !isTimeOut && !reveal }
+          onTimeOut={ this.onTimeOut }
+          notNextAnymore={ this.notNextAnymore }
+          getTimer={ this.getTimer }
+        />
         <section>
-          {
-            reveal
-              && (
-                <button
-                  type="button"
-                  data-testid="btn-next"
-                  onClick={ this.handleClick }
-                >
-                  Próxima
-                </button>
-              )
-          }
+          {(reveal || isTimeOut) && (
+            <button
+              type="button"
+              data-testid="btn-next"
+              onClick={ this.handleClick }
+            >
+              Próxima
+            </button>
+          )}
         </section>
       </section>
     );
   }
 }
-
 Game.defaultProps = {
   history: {},
 };
-
 Game.propTypes = {
   name: PropTypes.string.isRequired,
   gravatarImage: PropTypes.string.isRequired,
   gravatarEmail: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
@@ -208,5 +245,4 @@ const mapStateToProps = (state) => ({
   gravatarImage: state.player.gravatarImage,
   gravatarEmail: state.player.gravatarEmail,
 });
-
 export default connect(mapStateToProps)(Game);

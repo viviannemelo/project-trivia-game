@@ -24,7 +24,6 @@ O placar zerado em um elemento que deve possuir o atributo data-testid com o val
     const { name, score } = this.props;
     const { gravatar } = this.state;
     // const { player: { score } } = JSON.parse(localStorage.getItem('state'));
-
     return (
       <header className="App-header">
         <img src={ logo } className="App-logo" alt="logo" />
@@ -42,17 +41,14 @@ O placar zerado em um elemento que deve possuir o atributo data-testid com o val
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   name: state.player.name,
   score: state.player.score,
   gravatarImage: state.player.gravatarImage,
   gravatarEmail: state.player.gravatarEmail,
 });
-
 Header.propTypes = {
   gravatarEmail: PropTypes.string,
   name: PropTypes.string,
 }.isRequired;
-
 export default connect(mapStateToProps)(Header);
