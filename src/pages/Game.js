@@ -23,7 +23,6 @@ class Game extends Component {
     turn: 0,
     reveal: false,
     isTimeOut: false,
-    isNextQuestion: false,
   };
 
   async componentDidMount() {
@@ -89,13 +88,8 @@ class Game extends Component {
     this.setState({
       turn: turn + 1,
       reveal: false,
-      isNextQuestion: true,
       isTimeOut: false,
     });
-  };
-
-  notNextAnymore = () => {
-    this.setState({ isNextQuestion: false });
   };
 
   decodeHtml = (html) => { // to remove the HTML entities like &lt &quot...
@@ -111,7 +105,6 @@ class Game extends Component {
       turn,
       reveal,
       isTimeOut,
-      isNextQuestion,
     } = this.state;
     const { question, category, correct_answer: correct } = questions[turn];
 
@@ -141,9 +134,8 @@ class Game extends Component {
           ))}
         </section>
         <Counter
+          shouldPlay={ !isTimeOut && !reveal }
           onTimeOut={ this.onTimeOut }
-          isNextQuestion={ isNextQuestion }
-          notNextAnymore={ this.notNextAnymore }
         />
         <section>
           {(reveal || isTimeOut) && (
